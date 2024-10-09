@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<script type="text/javascript" src="https://getfirebug.com/firebug-lite-debug.js"></script>
+	<meta name="description" content="CS4406 Computer Graphics - Assignment #5s" />
+	<meta charset="utf-8" />
+	<title>Assignment 5</title>
+
+	</style>
+	<meta charset=utf-8 />
+	<title> CS4406 Computer Graphics - Programming Asignment U#5 </title>
+
+	<style id="jsbin-css">
+	</style>
+</head>
+
+<body>
+
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.5/dat.gui.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/94/three.min.js"></script>
+	<script src="https://cdn.rawgit.com/mrdoob/three.js/master/examples/js/controls/OrbitControls.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/6.2.1/math.min.js"></script>
+	<script src="http://uopeopleweb.com/js/Detector.js"></script>
+	<script type="text/javascript"></script>
+	<script>
+
+
+
+		// set the scene size
+		var WIDTH = 500, HEIGHT = 500;
+
+		// set some camera attributes
+		var VIEW_ANGLE = 75, ASPECT = WIDTH / HEIGHT, NEAR = 1, FAR = 1000;
+
+		// create a WebGL renderer, camera, and a scene
+		var renderer = new THREE.WebGLRenderer();
+		var scene = new THREE.Scene();
+		var clock = new THREE.Clock();
+		var camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
+
+		// the camera starts at 0,0,0 so pull it back
+		camera.position.z = 200;
+
+		// add the camera to the scene
+		scene.add(camera)
+		// set up the camera controls.  Please keep in mind that what this does is move the entire scene around.
+		// because the entire scene is moving the position of the camera and lights in relation to objects within 
+		// the scene doesn't change so the lighting on the surface of the object(s) will not change either
+		// var cameraControls = new OrbitControls(camera, renderer.domElement);
+		// cameraControls.addEventListener('mousemove', renderer);
+
+		// start the renderer
+		renderer.setSize(WIDTH, HEIGHT);
+
+		// attach the render-supplied DOM element
+		document.body.appendChild(renderer.domElement);
+		// ----------------------------------------------------------------------------------------
+		//  END OF THE STANDARD CODE FOR THE ASSIGNMENT
+		// ----------------------------------------------------------------------------------------
+		renderer.shadowMapEnabled = true;
+
+		renderer.shadowMapType = THREE.BasicShadowMap;
+
+		renderer.shadowMapSoft = true;
+
+		renderer.shadowMapAutoUpdate = true;
+
+		// Create a point light 
+		var areaLight = new THREE.RectAreaLight(0xffffff, 10);
+
+		//Create spotlight for illumination; areaLight does not affect shininess, etc. 
+
+		var spotLight = new THREE.SpotLight(0xffffff);
+
+		spotLight.position.set(0, 150, 0);
+
+		spotLight.castShadow = true;
+
+		// add to the scene 
+		scene.add(areaLight, spotLight);
+
+		//a plane is created as a base/floor surface beneath the methane molecule
+		var planeGeometry = new THREE.PlaneBufferGeometry(1000, 2000, 1); //size, seperations
+		var planeMaterial = new THREE.MeshPhongMaterial({
+			color: 0x00ff00,
+			emissive: 0x000000,
+			side: THREE.DoubleSide,
+		}); //green
+
+		var plane = new THREE.Mesh(planeGeometry, planeMaterial);
+
+		plane.position.y = -70;
+		plane.rotation.x = -Math.PI / 2;
+
+		//enable for the plane to receive a shadow
+		plane.receiveShadow = true;
+
+		//add the plane to the scene so that the methane shadow can be seen on it
+		camera.add(plane);
+
+		//the creation of geometries for the methane molecule
+		//carbon atom
+		var carbonGeometry = new THREE.SphereGeometry(25, 32, 32); //radius, width segments, height segments
+		var carbonMaterial = new THREE.MeshPhongMaterial({
+			color: 0xff0000, //red
+			emissive: 0xa22222,
+			shininess: 10,
+			specular: 0x0fffff,
+		}); 
+
+		var carbon = new THREE.Mesh(carbonGeometry, carbonMaterial);
+
+		//set the position of the carbon atom
+		carbon.position.set(0, 0, 0);
+
+		//enable the carbon atom to both cast and receive shadows
+		carbon.receiveShadow = true;
+		carbon.castShadow = true;
+
+		//hydrogen atoms
+		var hydrogenGeometry = new THREE.SphereGeometry(15, 32, 32); //radius, width segments, height segments
+		var hydrogenMaterial = new THREE.MeshPhongMaterial({
+			color: 0x0000ff, //blue
+			emissive: 0x000ff,
+			shininess: 10,
+			specular: 0x0fffff,
+		});
+
+		var hydrogen1 = new THREE.Mesh(hydrogenGeometry, hydrogenMaterial);
+		hydrogen2 = hydrogen1.clone();
+		hydrogen3 = hydrogen1.clone();
+		hydrogen4 = hydrogen1.clone();
+
+		//enable the hydrogen atoms to both cast and receive shadows
+		hydrogen1.receiveShadow = true;
+		hydrogen1.castShadow = true;
+
+		hydrogen2.receiveShadow = true;
+		hydrogen2.castShadow = true;
+
+		hydrogen3.receiveShadow = true;
+		hydrogen3.castShadow = true;
+
+		hydrogen4.receiveShadow = true;
+		hydrogen4.castShadow = true;
+
+		//set the positions for each hydrogen atom
+		hydrogen1.position.set(0, 60, 0);
+
+		hydrogen2.position.set(-50, -30, 20);
+
+		hydrogen3.position.set(50, -30, 20);
+
+		hydrogen4.position.set(0, -30, -50);
+
+		//bonds
+		var bondGeometry = new THREE.CylinderGeometry(5, 5, 60, 32);
+		var bondMaterial = new THREE.MeshPhongMaterial({
+			color: 0xffffff, //white
+			emissive: 0x808080, //grey
+			shininess: 10,
+		});
+
+		var bond1 = new THREE.Mesh(bondGeometry, bondMaterial);
+		bond2 = bond1.clone();
+		bond3 = bond1.clone();
+		bond4 = bond1.clone();
+
+		//enable the bonds to both cast and receive shadows
+		bond1.receiveShadow = true;
+		bond1.castShadow = true;
+
+		bond2.receiveShadow = true;
+		bond2.castShadow = true;
+
+		bond3.receiveShadow = true;
+		bond3.castShadow = true;
+
+		bond4.receiveShadow = true;
+		bond4.castShadow = true;
+
+		//set the position for each bond
+		bond1.position.set(0, 30, 0);
+
+		bond2.position.set(-25, -15, 10);
+		bond2.rotation.set(Math.PI / 3, Math.PI / 5, Math.PI / 2);
+
+		bond3.position.set(25, -15, 10);
+		bond3.rotation.set(Math.PI / 3, -Math.PI / 5, Math.PI / 2);
+
+		bond4.position.set(0, -15, -25);
+		bond4.rotation.set(Math.PI / 3, -Math.PI / 5, Math.PI);
+
+		//group the seperate bonds, hydrogen atoms, and carbon atom
+		var methane = new THREE.Group();
+
+		methane.add(carbon);
+
+		methane.add(hydrogen1);
+		methane.add(hydrogen2);
+		methane.add(hydrogen3);
+		methane.add(hydrogen4);
+
+		methane.add(bond1);
+		methane.add(bond2);
+		methane.add(bond3);
+		methane.add(bond4);
+
+		//add the methane molecule to the scene
+		scene.add(methane);
+
+		//this ensures that the render is refreshed
+		function animate() {
+			requestAnimationFrame(animate);
+
+			renderer.render(scene, camera);
+		}
+
+		animate();
+
+		// Event listeners to control the rotation of the methane molecule with mouse clicks/arrow keys 
+		function onDocumentMouseDown(event) {
+
+			event.preventDefault();
+
+			document.addEventListener('mousemove', onDocumentMouseMove);
+
+			document.addEventListener('mouseup', onDocumentMouseUp);
+		}
+
+		function onDocumentMouseMove(event) {
+
+			methane.rotation.y += event.movementX * 0.01;
+
+			methane.rotation.x += event.movementY * 0.01;
+		}
+
+		function onDocumentMouseUp() {
+
+			document.removeEventListener('mousemove', onDocumentMouseMove);
+
+			document.removeEventListener('mouseup', onDocumentMouseUp);
+		}
+
+		function onDocumentKeyDown(event) {
+
+			switch (event.keyCode) {
+
+				case 37: // Left arrow key
+					methane.rotation.y -= 0.1;
+					break;
+
+				case 39: // Right arrow key
+					methane.rotation.y += 0.1;
+					break;
+
+				case 38: // Up arrow key
+					methane.rotation.x -= 0.1;
+					break;
+
+				case 40: // Down arrow key
+					methane.rotation.x += 0.1;
+					break;
+			}
+		}
+
+		document.addEventListener('mousedown', onDocumentMouseDown);
+
+		document.addEventListener('keydown', onDocumentKeyDown);
+
+		// ----------------------------------------------------------------------------------------
+		// END OF YOUR CUSTOM CODE FOR THE ASSIGNMENT
+		// The rendering functions that follow are standard and can be used for this assignment.
+		// You are welcome to customize them or create your own if you desire, however, you can
+		// simply use the code provided.
+
+
+		// Standard functions for rendering the scene.  Notice how we have the animate function
+		// which submits a call to requestAnimationFrame to call animate.   This creates a loop
+		// that will render the scene again whenever something within the scene changes.
+
+
+
+	</script>
+</body>
+
+</html>
